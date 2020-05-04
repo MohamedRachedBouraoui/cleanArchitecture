@@ -11,6 +11,7 @@ Ce projet se base sur la "Clean architecture" présentée par "Jayson.Taylor".
   * NUnit   (Unit/Integration & Subcutaneuos test)
   * Respawn (reset DB)
   * FluentAssertions
+  * Moq
 
 2- Les Patterns:
   * CQRS
