@@ -10,10 +10,11 @@
   * Swagger
   * NUnit
   
-- PAtterns:
+- Patterns:
  * CQRS
  * UnitOfWork
  * Repository
+ * Spécifications
  
 - Avantages:
   * Cette architecture favorise les avantages suivants:
