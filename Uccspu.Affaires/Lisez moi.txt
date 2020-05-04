@@ -1,0 +1,3 @@
+﻿-1- Les comportements représentent les "Behaviours" de la lib "MediatR"
+-2- Les "Requetes" représentent les "Requests" de la lib "MediatR"
+-3- Les "Commandes" représentent les "Commands" de la lib "MediatR"
