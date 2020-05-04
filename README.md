@@ -4,10 +4,13 @@ Ce projet se base sur la "Clean architecture" présentée par "Jayson.Taylor".
   * EF.Core
   * Identity
   * Automapper
+  * FluentValidaions
   * MediatR
   * JWT
   * Swagger
   * NUnit
+  * Respawn (reset DB)
+  * FluentAssertions
 
 2- Les Patterns:
   * CQRS
@@ -17,6 +20,8 @@ Ce projet se base sur la "Clean architecture" présentée par "Jayson.Taylor".
  
 3- Cette architecture favorise les avantages suivants:
   * Séparation des préoccupations (Concerns separation)
+  * Indépendance du UI
+  * Indépendance des SGBD
   * Éviter les CROSSCUTTINGS (Logging/Performance/Authentification/Validation)     
   * Remplacer les outils (Frameworks) utilisés facilement et sans avoir à modifier toutes les parties du codes
   * Application des principes SOLID
