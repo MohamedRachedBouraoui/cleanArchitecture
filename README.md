@@ -15,8 +15,7 @@ Ce projet se base sur la "Clean architecture" présentée par "Jayson.Taylor".
   * Repository
   * Spécifications
  
-3- Les Avantages:
-  Cette architecture favorise les avantages suivants:
+3- Cette architecture favorise les avantages suivants:
     * Séparation des préoccupations (Concerns separation)
     * Éviter les CROSSCUTTINGS (Logging/Performance/Authentification/Validation)     
     * Remplacer les outils (Frameworks) utilisés facilement et sans avoir à modifier toutes les parties du codes
