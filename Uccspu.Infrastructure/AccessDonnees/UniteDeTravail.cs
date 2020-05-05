@@ -26,7 +26,7 @@ namespace Uccspu.Infrastructure.AccessDonnees
             _uccspuDbContext.Dispose();
         }
 
-        public async Task<bool> EnregistrerTous(CancellationToken cancellationToken)
+        public async Task<bool> EnregistrerTousAsync(CancellationToken cancellationToken)
         {
 
             var result = await _uccspuDbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -48,9 +48,7 @@ namespace Uccspu.Infrastructure.AccessDonnees
 
                 var repositoryType = typeof(Repository<,>);
                 Type[] typeParameters = new Type[] { typeof(TEntity), typeof(TKey) };
-                var repositoryInstance = Activator.CreateInstance(repositoryType.MakeGenericType(typeParameters), _uccspuDbContext, _mapper);
-
-                
+                var repositoryInstance = Activator.CreateInstance(repositoryType.MakeGenericType(typeParameters), _uccspuDbContext, _mapper);                
                 _repositories.Add(entityName, repositoryInstance);
             }
 

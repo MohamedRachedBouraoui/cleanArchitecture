@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Uccspu.AccessDonnees;
 using Uccspu.Affaires.Communs.Interfaces;
 using Uccspu.Api;
-using Uccspu.Domaine.Entites;
+using Uccspu.Domaine.Communs;
 using Uccspu.Infrastructure.AccessDonnees.Identity;
 
 namespace Affaire.Tests.Integration
@@ -24,11 +24,13 @@ namespace Affaire.Tests.Integration
     {
         private static IConfigurationRoot _configuration;
         private static IServiceScopeFactory _scopeFactory;
-        private static Checkpoint _checkpoint;
-        private static string _IdUtilisateur;
+        private static Checkpoint _checkpointUccspu;
+        private static Checkpoint _checkpointIdentity;
+        public static string _IdUtilisateur;
+        private static ServiceCollection _services;
 
         [OneTimeSetUp]
-        public void RunBeforeAnyTests()
+        public async Task ExecuterUneFoisAvantTests()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -39,35 +41,47 @@ namespace Affaire.Tests.Integration
 
             var startup = new Startup(_configuration);
 
-            var services = new ServiceCollection();
+            _services = new ServiceCollection();
 
-            services.AddSingleton(Mock.Of<IWebHostEnvironment>(w =>
+            // Utilisé piour la configuration des services Identity 
+            _services.AddSingleton(Mock.Of<IWebHostEnvironment>(w =>
                 w.EnvironmentName == "Development" &&
                 w.ApplicationName == "Uccspu.Api"));
 
-            services.AddLogging();
 
-            startup.ConfigureServices(services);
+            _services.AddLogging();
+            startup.ConfigureServices(_services);
 
-            // Replace service registration for ICurrentUserService
-            // Remove existing registration
-            var currentUserServiceDescriptor = services.FirstOrDefault(d =>
-                d.ServiceType == typeof(IUtilisateurEnCoursService));
+            ConfigurerServiceUtilisateurEnCoursPourTests();
 
-            services.Remove(currentUserServiceDescriptor);
+            _scopeFactory = _services.BuildServiceProvider().GetService<IServiceScopeFactory>();
 
-            // Register testing version
-            services.AddTransient(provider =>
-                Mock.Of<IUtilisateurEnCoursService>(s => s.IdUtilisateur == _IdUtilisateur));
-
-            _scopeFactory = services.BuildServiceProvider().GetService<IServiceScopeFactory>();
-
-            _checkpoint = new Checkpoint
+            _checkpointIdentity = new Checkpoint
             {
                 TablesToIgnore = new[] { "__EFMigrationsHistory" }
             };
 
+            _checkpointUccspu = new Checkpoint
+            {
+                TablesToIgnore = new[] { "__EFMigrationsHistory" }
+            };
+
+
             PreparerBaseDonnees();
+        }
+
+        private static void ConfigurerServiceUtilisateurEnCoursPourTests()
+        {
+
+            // Remplacer l'implémentation du 'ICurrentUserService'
+            // par un moq
+
+            var currentUserServiceDescriptor = _services.FirstOrDefault(d =>
+                d.ServiceType == typeof(IUtilisateurEnCoursService));
+
+            _services.Remove(currentUserServiceDescriptor);
+
+            _services.AddTransient(provider => Mock.Of<IUtilisateurEnCoursService>(u => u.IdUtilisateur == _IdUtilisateur));
         }
 
         private static void PreparerBaseDonnees()
@@ -77,23 +91,19 @@ namespace Affaire.Tests.Integration
             var context = scope.ServiceProvider.GetService<UccspuDbContext>();
 
             context.Database.Migrate();
+
+            var contextIdentity = scope.ServiceProvider.GetService<UccspuIdentityDbContext>();
+
+            contextIdentity.Database.Migrate();
+
         }
 
-        public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
+        public static async Task<string> ConfigurerUtilisateurParDefautAsync()
         {
-            using var scope = _scopeFactory.CreateScope();
-
-            var mediator = scope.ServiceProvider.GetService<IMediator>();
-
-            return await mediator.Send(request);
+            return await ConfigurerUtilisateurParDefaut("test@local", "Testing1234!");
         }
 
-        public static async Task<string> RunAsDefaultUserAsync()
-        {
-            return await RunAsUserAsync("test@local", "Testing1234!");
-        }
-
-        public static async Task<string> RunAsUserAsync(string userName, string password)
+        public static async Task<string> ConfigurerUtilisateurParDefaut(string userName, string password)
         {
             using var scope = _scopeFactory.CreateScope();
 
@@ -107,37 +117,40 @@ namespace Affaire.Tests.Integration
 
             return _IdUtilisateur;
         }
+        /// <summary>
+        /// Executer la méthode 'Send' de MediatR
+        /// </summary>
+        /// <typeparam name="TResponse"></typeparam>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static async Task<TResponse> MediatRSendAsync<TResponse>(IRequest<TResponse> request)
+        {
+            using var scope = _scopeFactory.CreateScope();
 
+            var mediator = scope.ServiceProvider.GetService<IMediator>();
+
+            return await mediator.Send(request);
+        }
+
+        public static async Task<TEntity> RecupererParIdAsync<TEntity, TKey>(TKey id)
+            where TEntity : Auditable
+        {
+            using var scope = _scopeFactory.CreateScope();
+
+            IUniteDeTravail uniteDeTavail = scope.ServiceProvider.GetService<IUniteDeTravail>();
+
+
+            return await uniteDeTavail.Repository<TEntity, TKey>().RecupererParIdAsync(id);
+        }
         public static async Task ReinitialiserEtatInitial()
         {
-            await _checkpoint.Reset(_configuration.GetConnectionString("DefaultConnection"));
+            await _checkpointUccspu.Reset(_configuration.GetConnectionString("DefaultConnection"));
+            await _checkpointIdentity.Reset(_configuration.GetConnectionString("IdentityConnection"));
             _IdUtilisateur = null;
         }
 
-        public static async Task<TEntity> FindAsync<TEntity>(int id)
-            where TEntity : class
-        {
-            using var scope = _scopeFactory.CreateScope();
-
-            var context = scope.ServiceProvider.GetService<UccspuDbContext>();
-
-            return await context.FindAsync<TEntity>(id);
-        }
-
-        public static async Task AddAsync<TEntity>(TEntity entity)
-            where TEntity : class
-        {
-            using var scope = _scopeFactory.CreateScope();
-
-            var context = scope.ServiceProvider.GetService<UccspuDbContext>();
-
-            context.Add(entity);
-
-            await context.SaveChangesAsync();
-        }
-
         [OneTimeTearDown]
-        public void RunAfterAnyTests()
+        public void ExecuterALaFinDeTousLesTests()
         {
         }
     }

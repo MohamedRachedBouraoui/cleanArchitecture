@@ -35,7 +35,7 @@ namespace Uccspu.Affaires.Episodes.Commandes.SupprimerEpisode
                 _episodeRepository.Supprimer(episodeASupprimer);
 
 
-                bool resultat = await _uniteDeTravail.EnregistrerTous(cancellationToken);
+                bool resultat = await _uniteDeTravail.EnregistrerTousAsync(cancellationToken);
                 return new ReponseApi(resultat?400:200); 
             }
         }

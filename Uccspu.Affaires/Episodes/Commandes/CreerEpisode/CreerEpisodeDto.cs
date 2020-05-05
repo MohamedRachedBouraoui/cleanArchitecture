@@ -7,6 +7,6 @@ namespace Uccspu.Affaires.Episodes.Commandes.CreerEpisode
     public class CreerEpisodeDto : ReponseApi, IMapFrom<Episode>
     {
         public int Id { get; set; }
-        public string Libelle { get; set; }
+        public string Libelle { get; set; }        
     }
 }

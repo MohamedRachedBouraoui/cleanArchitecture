@@ -2,6 +2,6 @@
 {
     public interface IUtilisateurEnCoursService
     {
-        string IdUtilisateur { get; }
+        string IdUtilisateur { get; set; }
     }
 }

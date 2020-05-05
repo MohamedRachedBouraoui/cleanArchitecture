@@ -23,8 +23,6 @@ namespace Uccspu.Api.Controllers
                 400 => BadRequest(reponseApi),
                 401 => Unauthorized(reponseApi),
                 404 => NotFound(reponseApi),
-                //500 =>   Internal  ServInter"Une erreur interne a eu lieu ! S'il vous plait, veuillez contacter l'équipe de support.",
-
                 _ => null
             };
         }

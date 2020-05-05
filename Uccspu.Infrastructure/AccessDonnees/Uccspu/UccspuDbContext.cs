@@ -32,6 +32,7 @@ namespace Uccspu.AccessDonnees
         LoggerFactory _myLoggerFactory = new LoggerFactory(new[] { debugLoggerProvider });
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.UseLoggerFactory(_myLoggerFactory);
         }
 

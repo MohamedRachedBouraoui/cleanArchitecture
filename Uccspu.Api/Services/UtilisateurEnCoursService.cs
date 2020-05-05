@@ -6,6 +6,10 @@ namespace Uccspu.Api.Services
 {
     public class UtilisateurEnCoursService : IUtilisateurEnCoursService
     {
+        public UtilisateurEnCoursService()
+        {
+
+        }
         public UtilisateurEnCoursService(IHttpContextAccessor httpContextAccessor)
         {
             IdUtilisateur = httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);

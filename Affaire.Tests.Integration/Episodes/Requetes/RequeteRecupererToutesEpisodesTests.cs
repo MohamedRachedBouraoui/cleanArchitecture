@@ -12,7 +12,7 @@ namespace Affaire.Tests.Integration.Episodes.Requetes
         public async Task DevraitRetournerAuMoinsUneEpisode()
         {
             var requete = new RequeteRecupererToutesEpisodes();
-            var episodes = await SendAsync(requete);
+            var episodes = await MediatRSendAsync(requete);
 
             episodes.Should().NotBeNull();
         }

@@ -40,7 +40,7 @@ namespace Uccspu.Affaires.Episodes.Commandes.ModifierEpisode
             _episodeRepository.Modifier(episodeAModifier);
 
 
-            await _uniteDeTravail.EnregistrerTous(cancellationToken);
+            await _uniteDeTravail.EnregistrerTousAsync(cancellationToken);
             ModifierEpisodeDto modifierEpisodeDto = _mapper.Map<ModifierEpisodeDto>(episodeAModifier);
             modifierEpisodeDto.ReponseApiCodeStatut_ = 200;
             return modifierEpisodeDto;

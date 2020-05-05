@@ -12,7 +12,7 @@ namespace Uccspu.Affaires.Episodes.Commandes.CreerEpisode
     [Authentifier]
     public class CommandeCreerEpisode : ReponseApi, IRequest<CreerEpisodeDto>
     {
-        public int Id { get; set; }
+       // public int Id { get; set; }
         public string Libelle { get; set; }
     }
     public class GestionnaireCommandeCreerEpisode : IRequestHandler<CommandeCreerEpisode, CreerEpisodeDto>
@@ -36,7 +36,7 @@ namespace Uccspu.Affaires.Episodes.Commandes.CreerEpisode
 
             _episodeRepository.Ajouter(episode);
 
-            await _uniteDeTravail.EnregistrerTous(cancellationToken);
+            await _uniteDeTravail.EnregistrerTousAsync(cancellationToken);
 
             CreerEpisodeDto creerEpisodeDto = _mapper.Map<CreerEpisodeDto>(episode);
             creerEpisodeDto.ReponseApiCodeStatut_ = 201;
